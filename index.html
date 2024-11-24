@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz de Segurança Online</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #A3C1DA; /* Azul */
+      background-image: url('https://brasscom.org.br/wp-content/uploads/2022/03/Estudo-Seguranca-da-Informacao-e-Seguranca-Cibernetica.png'); /* Caminho para a imagem */
+      background-size: cover; /* Ajusta a imagem para cobrir toda a tela */
+      background-position: center; /* Centraliza a imagem */
+      background-attachment: fixed; /* Faz a imagem ficar fixa ao rolar a página */
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh; /* Ajusta para ocupar toda a altura da tela */
+      flex-direction: column;
+      box-sizing: border-box; /* Inclui padding e bordas no cálculo do tamanho total */
+    }
+
+    #start-container, #score-container {
+      background-color: rgba(255, 255, 255, 0.8); /* Caixa com fundo branco e opaco */
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 2em; /* Ajuste para melhor responsividade */
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    button {
+      padding: 10px 20px;
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    #quiz-container {
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      padding: 20px;
+      max-width: 90%; /* Ajuste para caber em telas menores */
+      width: 400px;
+      text-align: center;
+      overflow-y: auto; /* Permite rolagem para textos longos */
+    }
+
+    #options {
+      display: flex;
+      flex-direction: column;
+      padding: 0;
+      margin: 0;
+    }
+
+    #options label {
+      display: block;
+      text-align: left;
+      margin: 10px 0;
+      padding: 10px;
+      background-color: #e9e9e9;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    #options label:hover {
+      background-color: #d1d1d1;
+    }
+
+    input[type="radio"] {
+      margin-right: 10px;
+    }
+
+    #score-container p {
+      font-size: 1.5em;
+    }
+
+    ul {
+      padding: 0;
+      list-style: disc;
+      margin: 10px 0;
+      text-align: left;
+    }
+
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 1.5em;
+      }
+
+      #quiz-container {
+        padding: 10px; /* Reduz o espaço interno em dispositivos menores */
+      }
+    }
+</style>
+
+</head>
+<body>
+  <div id="start-container">
+    <h1>Segurança da Informação na Prática</h1>
+    <button id="start-btn">Iniciar</button>
+  </div>
+
+  <div id="quiz-container" class="hidden">
+    <h2 id="question"></h2>
+    <div id="options"></div>
+    <button id="next-btn" class="hidden">Próxima</button>
+  </div>
+
+  <div id="score-container" class="hidden">
+    <p id="final-score"></p>
+    <button id="restart-btn">Reiniciar Quiz</button>
+  </div>
+
+  <script>
+    const questions = [
+      {
+        question: "O que é uma senha segura?",
+        options: [
+          "Apenas números",
+          "Um conjunto de letras, números e símbolos",
+          "Somente o nome do usuário",
+          "Uma palavra fácil de lembrar"
+        ],
+        correct: 1
+      },
+      {
+        question: "Qual a atitude correta ao receber um e-mail de um remetente desconhecido pedindo informações pessoais?",
+        options: [
+          "Responder ao e-mail educadamente para obter mais detalhes.",
+          "Ignorar e marcar como spam para evitar problemas futuros.",
+          "Clicar nos links para verificar se o pedido é legítimo.",
+          "Examinar cuidadosamente o e-mail e verificar sua autenticidade antes de tomar qualquer ação."
+        ],
+        correct: 3
+      },
+      {
+        question: "Por que é importante usar senhas fortes?",
+        options: [],
+        text: `
+          Uma senha forte é a principal barreira para evitar que a maioria de suas contas on-line sejam invadidas. Você deve criar senhas capazes de combater os métodos modernos de roubo.
+
+          É importante se atentar a alguns detalhes essenciais para manter suas contas protegidas, como:
+          <ul style="text-align: left;">
+            <li>Aplicar um comprimento mínimo de 12 caracteres.</li>
+            <li>Fazer uma combinação de caracteres de diferentes tipos: letras, números, maiúsculas, minúsculas, sinais gráficos, etc.</li>
+            <li>Não repetir a mesma senha para contas diferentes.</li>
+            <li>Evitar combinações muito similares entre as senhas.</li>
+            <li>Não usar sequências lógicas ou padrões facilmente dedutíveis, como 1234 e qwerty.</li>
+            <li>Não cair na tentação de usar informações pessoais previsíveis, como nomes, endereços e datas.</li>
+            <li>Priorizar a aleatoriedade dos códigos, em vez de usar palavras existentes no dicionário.</li>
+            <li>Evitar substituições clássicas (e óbvias), como E por 3 ou O por 0.</li>
+          </ul>
+          Agora que você conhece essas dicas, aplique-as para garantir mais segurança nas suas contas online.
+          `
+      },
+      {
+        question: "O que é uma VPN?",
+        options: [
+          "Um tipo de firewall.",
+          "Um software que criptografa e protege sua conexão na internet.",
+          "Um programa para criar senhas seguras.",
+          "Um vírus que rouba dados."
+        ],
+        correct: 1
+      },
+      {
+        question: "O que significa o ícone de cadeado na barra de endereço do navegador?",
+        options: [
+          "Que o site é verificado como seguro para navegar.",
+          "Que o site é 100% livre de ameaças cibernéticas.",
+          "Que o site é recomendado pelo seu navegador.",
+          "Que o site não permite downloads."
+        ],
+        correct: 0
+      },
+      {
+        question: "O que significa 'phishing'?",
+        options: [
+          "Uma técnica para enganar pessoas e roubar informações pessoais.",
+          "Um método usado para obter dados confidenciais por meio de e-mails ou sites falsos.",
+          "Um vírus que pode infectar dispositivos eletrônicos.",
+          "Um ataque cibernético que envolve invasão direta de sistemas protegidos."
+        ],
+        correct: 1
+      },
+	
+      {
+        question: "O que é e como funciona uma VPN?",
+        options: [],
+        text: `
+          A VPN é uma ferramenta que possibilita se conectar à Internet de maneira segura e confidencial, e pode ser instalada em dispositivos como computadores, tablets e celulares. Ao acessar a web com o recurso, os dados enviados e recebidos são redirecionados para o servidor criptografados, e assim, não podem ser lidos caso alguém tente interceptá-los.
+
+          Além disso, a identidade do usuário e sua localização também são protegidos porque a VPN oculta o IP pessoal, fornecendo outro endereço para disfarçar a verdadeira origem do acesso. Dessa forma, é possível navegar anonimamente pela web e impedir que as atividades online possam ser rastreadas por terceiros.
+
+          <br>
+          <br>
+          <strong>Benefícios de usar uma VPN</strong>
+          <ul style="text-align: left;">
+            <li><strong>Criptografia segura:</strong> Protege seus dados contra hackers.</li>
+            <li><strong>Anonimato:</strong> Oculta sua localização real.</li>
+            <li><strong>Acesso global:</strong> Permite visualizar conteúdos restritos por região.</li>
+            <li><strong>Segurança em redes públicas:</strong> Protege informações sensíveis em conexões Wi-Fi abertas.</li>
+          </ul>
+        `
+      },
+
+      {
+        question: "O que é um firewall?",
+        options: [
+          "Um programa para bloquear anúncios na internet.",
+          "Um software que protege dispositivos contra acessos não autorizados.",
+          "Um antivírus especializado em dispositivos móveis.",
+          "Uma ferramenta para criar senhas seguras automaticamente."
+        ],
+        correct: 1
+      },
+      {
+        question: "Por que é importante atualizar seus dispositivos regularmente?",
+        options: [
+          "Para melhorar o desempenho gráfico.",
+          "Para corrigir vulnerabilidades de segurança.",
+          "Para aumentar o espaço de armazenamento.",
+          "Para garantir compatibilidade com antivírus antigos."
+        ],
+        correct: 1
+      },
+      {
+        question: "O que é autenticação de dois fatores (2FA)?",
+        options: [
+          "Um tipo de senha que muda a cada 24 horas.",
+          "Um método que exige dois passos para acessar uma conta, como senha e código enviado ao celular.",
+          "Um aplicativo que monitora acessos não autorizados.",
+          "Uma configuração que limita acessos a horários específicos."
+        ],
+        correct: 1
+      },
+    	{
+        question: "O que é e como funciona o antivírus?",
+        options: [],
+        text: `
+          O antivírus é um software que detecta malwares como vírus, spywares e ransomwares, prevenindo sua execução. Ele verifica arquivos antes de serem abertos e pode isolar ou excluir ameaças. Também remove malwares já presentes no sistema, impedindo que causem danos.
+
+          <br><br>
+
+          <strong>O que é e como funciona o firewall?</strong>
+          <br>
+          O firewall atua como uma barreira contra acessos não autorizados, bloqueando tentativas de invasão e proteção dos dados. Ele impede que criminosos acessem seu sistema remotamente, monitorando transferências de dados.
+
+          <br><br>
+
+          <strong>Diferença entre antivírus e firewall</strong>
+          <br>
+          O antivírus foca em detectar e eliminar malwares, enquanto o firewall protege a rede, bloqueando invasões ativas e controlando transferências de dados para prevenir acessos indevidos.
+        `
+      },
+      {
+        question: "Como proteger seus dados em redes sociais?",
+        options: [
+          "Evitando compartilhar informações pessoais ou localização.",
+          "Aceitando solicitações de amizade de todos para aumentar a rede.",
+          "Desativando as configurações de privacidade.",
+          "Usando a mesma senha para todas as contas."
+        ],
+        correct: 0
+      },
+      {
+        question: "O que é criptografia de dados?",
+        options: [
+          "Um método de proteger informações ao torná-las ilegíveis para terceiros.",
+          "Uma ferramenta para excluir dados automaticamente.",
+          "Um sistema que armazena senhas de forma visível.",
+          "Um software que substitui firewalls."
+        ],
+        correct: 0
+      },
+      
+    ];
+
+    let currentQuestionIndex = 0;
+    let score = 0;
+
+    const startButton = document.getElementById('start-btn');
+    const quizContainer = document.getElementById('quiz-container');
+    const startContainer = document.getElementById('start-container');
+    const questionElement = document.getElementById('question');
+    const optionsContainer = document.getElementById('options');
+    const nextButton = document.getElementById('next-btn');
+    const scoreContainer = document.getElementById('score-container');
+    const finalScoreElement = document.getElementById('final-score');
+    const restartButton = document.getElementById('restart-btn');
+
+    startButton.addEventListener('click', startQuiz);
+    restartButton.addEventListener('click', restartQuiz);
+
+    function startQuiz() {
+      startContainer.style.display = 'none';
+      quizContainer.style.display = 'block';
+      showQuestion();
+    }
+
+    function showQuestion() {
+  const currentQuestion = questions[currentQuestionIndex];
+
+  // Se a pergunta tem um texto explicativo (sem opções)
+  if (currentQuestion.text) {
+    questionElement.innerText = currentQuestion.question; // título da página explicativa
+    optionsContainer.innerHTML = `<p>${currentQuestion.text}</p>`; // texto explicativo
+
+    nextButton.style.display = 'inline-block'; // Exibe o botão para avançar
+  } else {
+    questionElement.innerText = currentQuestion.question;
+    optionsContainer.innerHTML = '';
+
+    currentQuestion.options.forEach((option, index) => {
+      const optionLabel = document.createElement('label');
+      const input = document.createElement('input');
+      input.type = 'radio';
+      input.name = 'option';
+      input.value = index;
+      optionLabel.appendChild(input);
+      optionLabel.appendChild(document.createTextNode(option));
+      optionsContainer.appendChild(optionLabel);
+    });
+
+    nextButton.style.display = 'inline-block';
+  }
+}
+
+
+    nextButton.addEventListener('click', handleNext);
+
+    function handleNext() {
+  // Verifica se é uma pergunta com texto explicativo
+  const currentQuestion = questions[currentQuestionIndex];
+  if (currentQuestion.text) {
+    // Se for uma página de texto, avança sem precisar de resposta
+    currentQuestionIndex++;
+    if (currentQuestionIndex < questions.length) {
+      showQuestion();
+    } else {
+      showFinalScore();
+    }
+  } else {
+    // Verifica se o usuário selecionou uma resposta
+    const selectedOption = document.querySelector('input[name="option"]:checked');
+    if (selectedOption) {
+      const selectedValue = parseInt(selectedOption.value);
+      if (selectedValue === currentQuestion.correct) {
+        score++;
+      }
+      currentQuestionIndex++;
+      if (currentQuestionIndex < questions.length) {
+        showQuestion();
+      } else {
+        showFinalScore();
+      }
+    } else {
+      alert('Por favor, selecione uma alternativa.');
+    }
+  }
+}
+
+    function showFinalScore() {
+      quizContainer.style.display = 'none';
+      scoreContainer.style.display = 'block';
+      finalScoreElement.innerText = `Sua pontuação final é: ${score} de 10`;
+    }
+	function showTextPage(textContent) {
+  quizContainer.style.display = 'none'; // Esconde o quiz
+  const textContainer = document.createElement('div');
+  textContainer.style.backgroundColor = '#fff';
+  textContainer.style.padding = '20px';
+  textContainer.style.borderRadius = '8px';
+  textContainer.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)';
+  textContainer.innerHTML = `<h2>${textContent}</h2><button onclick="nextTextPage()">Próxima</button>`;
+  document.body.appendChild(textContainer);
+}
+	function nextTextPage() {
+  // Remover o conteúdo de texto
+  document.body.removeChild(document.body.lastChild);
+  currentQuestionIndex++;  // Avança para a próxima pergunta
+  showQuestion();  // Exibe a próxima pergunta do quiz
+}
+
+    function restartQuiz() {
+      score = 0;
+      currentQuestionIndex = 0;
+      scoreContainer.style.display = 'none';
+      startContainer.style.display = 'block';
+    }
+  </script>
+</body>
+</html>
